@@ -13,17 +13,17 @@ def convert_number_to_image_file_name(number):
     return '%06d.jpg' % number
 
 
-def create_all_filepaths(folder_directory, number_of_images):
+def all_frames_filespath(folder_directory, number_of_frames):
     """
 
     :param folder_directory:
-    :param number_of_images:
+    :param number_of_frames:
     :return:
     :rtype: [str]
     """
-    filepaths = [None]*(number_of_images+1)
+    filepaths = [None]*(number_of_frames + 1)
 
-    for frame_number in range(number_of_images+1):
+    for frame_number in range(number_of_frames+1):
         filepaths[frame_number] = '%s\%s' % (folder_directory, convert_number_to_image_file_name(frame_number))
 
     return filepaths
