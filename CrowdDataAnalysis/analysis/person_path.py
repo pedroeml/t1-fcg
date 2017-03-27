@@ -6,7 +6,7 @@ class PersonPath:
 
         :param id_number:
         :param frame_coordinates_list:
-        :type frame_coordinates_list: [FrameCoordList]
+        :type frame_coordinates_list: FrameCoordList
         """
         self.id_number = id_number
         self.frame_coordinates_list = frame_coordinates_list
