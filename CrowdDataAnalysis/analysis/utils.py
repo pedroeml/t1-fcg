@@ -1,6 +1,7 @@
 from analysis.frame_coord import FrameCoord
 from analysis.frame_coord_list import FrameCoordList
 from analysis.person_path import PersonPath
+from analysis.people_paths import PeoplePaths
 
 
 def create_people_paths(image_coords_paths):
@@ -9,7 +10,7 @@ def create_people_paths(image_coords_paths):
     :param image_coords_paths:
     :type image_coords_paths: [[int]]
     :return:
-    :rtype: [PersonPath]
+    :rtype: PeoplePaths
     """
     people_paths = [None]*len(image_coords_paths)
 
@@ -19,7 +20,7 @@ def create_people_paths(image_coords_paths):
         people_paths[index] = person_path
         index += 1
 
-    return people_paths
+    return PeoplePaths(people_paths)
 
 
 def create_person(coords_path):
@@ -31,7 +32,7 @@ def create_person(coords_path):
     :rtype: PersonPath
     """
     id_number = coords_path[0]
-    fr_coordinates = [None]*((len(coords_path)-1)/3)  # excluding the index 0 (which is the id) the number of triples is the length of this array
+    fr_coordinates = [None]*int((len(coords_path)-1)/3)  # excluding the index 0 (which is the id) the number of triples is the length of this array
 
     index = 0
     for i in range(1, len(coords_path), 3):
