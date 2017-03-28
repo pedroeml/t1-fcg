@@ -21,7 +21,7 @@ class PeoplePaths:
         everyone_in_frame = deque()
 
         for person_path in self.people_paths:
-            if frame_number == person_path.frame_coordinates_list.current_frame_coord().frame_number:
+            if frame_number == person_path.image_frame_coordinates_list.current_frame_coord().frame_number:
                 everyone_in_frame.append(person_path)
 
         return list(everyone_in_frame)
