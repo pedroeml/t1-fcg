@@ -2,15 +2,17 @@ from analysis.frame_coord import FrameCoord
 from analysis.frame_coord_list import FrameCoordList
 from analysis.person_path import PersonPath
 from analysis.people_paths import PeoplePaths
+import numpy as np
+from graph.graph import Graph
 
 
 def create_people_paths(image_coords_paths, world_coords_paths):
     """
 
-    :param image_coords_paths:
-    :type image_coords_paths: [[int]]
-    :param world_coords_paths
-    :type world_coords_paths: [[int]]
+    :param image_coords_paths: [[int]]
+    :type image_coords_paths: list
+    :param world_coords_paths: [[int]]
+    :type world_coords_paths: list
     :return:
     :rtype: PeoplePaths
     """
@@ -31,10 +33,10 @@ def create_people_paths(image_coords_paths, world_coords_paths):
 def create_person(image_coords_path, world_coords_path):
     """
 
-    :param image_coords_path:
-    :type image_coords_path: [int]
-    :param world_coords_path:
-    :type world_coords_path: [int]
+    :param image_coords_path: [int]
+    :type image_coords_path: list
+    :param world_coords_path: [int]
+    :type world_coords_path: list
     :return:
     :rtype: PersonPath
     """
@@ -50,10 +52,10 @@ def create_person(image_coords_path, world_coords_path):
 def create_frame_coords_list(coords_path):
     """
     
-    :param coords_path: 
-    :type coords_path: [int]
-    :return: 
-    :rtype: int, [int]
+    :param coords_path: [int]
+    :type coords_path: list
+    :return: int, [int]
+    :rtype: tuple
     """
     id_number = coords_path[0]
     fr_coordinates = [None]*int((len(coords_path) - 1) / 3)  # excluding the index 0 (which is the id) the number of triples is the length of this array
@@ -67,3 +69,70 @@ def create_frame_coords_list(coords_path):
         index += 1
 
     return id_number, fr_coordinates
+
+
+def calc_world_dimensions(people_paths):
+    world_min_x = people_paths.people_paths[0].world_frame_coordinates_list.frame_coords[0].x
+    world_max_x = world_min_x
+    world_min_y = people_paths.people_paths[0].world_frame_coordinates_list.frame_coords[0].y
+    world_max_y = world_min_y
+
+    for person_path in people_paths.people_paths:
+        for frame_coord in person_path.world_frame_coordinates_list.frame_coords:
+            world_min_x = frame_coord.x if frame_coord.x < world_min_x else world_min_x
+            world_max_x = frame_coord.x if frame_coord.x > world_max_x else world_max_x
+            world_min_y = frame_coord.y if frame_coord.y < world_min_y else world_min_y
+            world_max_y = frame_coord.y if frame_coord.y > world_max_y else world_max_y
+
+    world_width = world_max_x - world_min_x
+    world_height = world_max_y - world_min_y
+
+    return world_min_x, world_min_y, world_max_x, world_max_y, world_width, world_height
+
+
+def create_graph(people_paths):
+    """
+    
+    :param people_paths: 
+    :type people_paths: PeoplePaths
+    :return: 
+    :rtype: Graph
+    """
+    people_graph = Graph()
+
+    for person_path in people_paths.people_paths:
+        people_graph.add_node(person_path.id_number)
+
+    return people_graph
+
+
+def calc_distances_for_everyon_in_frame(everyone_in_frame, people_graph):
+    """
+    
+    :param everyone_in_frame: [PersonPath]
+    :type everyone_in_frame: list
+    :param people_graph: 
+    :type people_graph: Graph
+    :return: 
+    :rtype: Graph
+    """
+    points = [[person_path.world_frame_coordinates_list.current_frame_coord().x, person_path.world_frame_coordinates_list.current_frame_coord().y] for person_path in everyone_in_frame]  # all points of everyone in this frame
+    points = np.array(points)
+    ids = [person_path.id_number for person_path in everyone_in_frame]
+
+    for index, person_path in enumerate(everyone_in_frame):
+        x, y = person_path.world_frame_coordinates_list.current_frame_coord_xy()
+        point = np.array([x, y])
+
+        all_euclidean_distances = np.linalg.norm(points - point, axis=1)  # calculate all euclidean distances
+
+        for i in range(len(ids)):
+            id_number = ids[i]
+
+            if id_number == person_path.id_number:  # if it's the same id as the person_path's id
+                continue
+
+            distance = all_euclidean_distances[i]
+            people_graph.add_edge(person_path.id_number, id_number, distance)
+
+    return people_graph
