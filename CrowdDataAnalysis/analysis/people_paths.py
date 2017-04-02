@@ -6,8 +6,8 @@ class PeoplePaths:
     def __init__(self, people_paths):
         """
 
-        :param people_paths:
-        :type people_paths: [PersonPath]
+        :param people_paths: [PersonPath]
+        :type people_paths: list
         """
         self.people_paths = people_paths
 
@@ -15,8 +15,8 @@ class PeoplePaths:
         """
 
         :param frame_number:
-        :return:
-        :rtype: [PersonPath]
+        :return: [PersonPath]
+        :rtype: list
         """
         everyone_in_frame = deque()
 
