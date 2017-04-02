@@ -2,7 +2,7 @@ from graph.edge import Edge
 
 
 class Node:
-    def __init__(self, item, edges={}):
+    def __init__(self, item):
         """
 
         :param item:
@@ -10,7 +10,7 @@ class Node:
         :type edges: dict
         """
         self.item = item
-        self.edges = edges
+        self.edges = {}
 
     def add_edge(self, node, weight):
         """
@@ -21,11 +21,11 @@ class Node:
         :return:
         """
         try:    # try to find the edge between self and node
-            target = self.find_edge(node)
+            edge = self.find_edge(node)
         except KeyError:    # there is no edge between them
             self.edges[node.item] = Edge(self, node, weight)    # then create one
         else:
-            target.change_weight(weight)    # change its weight
+            edge.change_weight(weight)    # change its weight
 
     def remove_edge(self, node):
         self.edges.pop(node.item)
