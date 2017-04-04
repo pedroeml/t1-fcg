@@ -5,6 +5,7 @@ from analysis.frame_coord_list import FrameCoordList
 from analysis.people_paths import PeoplePaths
 from analysis.person_path import PersonPath
 from graph.graph import Graph
+from analysis.distance_event import DistanceEvent
 
 
 def create_people_paths(image_coords_paths, world_coords_paths):
@@ -146,7 +147,41 @@ def calc_distances_for_everyon_in_frame(everyone_in_frame, people_graph):
             distance = all_euclidean_distances[i]
             people_graph.add_edge(person_path.id_number, id_number, distance)
 
+            if distance < 400:  # if its not too far
+                distance_event(person_path.id_number, id_number, people_graph)
+
     return people_graph
+
+
+def distance_event(id_number_a, id_number_b, people_graph):
+    """
+    
+    :param id_number_a: 
+    :param id_number_b: 
+    :param people_graph: 
+    :type people_graph: Graph
+    :return: 
+    """
+    node_a = people_graph.find_node(id_number_a)
+    node_b = people_graph.find_node(id_number_b)
+    edge = node_a.find_edge(node_b)
+
+    try:
+        previous_weight = edge.weight_history[-2]
+        before_previous_wiehgt = edge.weight_history[-3]
+    except IndexError as indexerr:
+        return None
+    else:
+        if abs(edge.weight - previous_weight) > 2:    # ignoring little distance changes
+            if edge.weight < previous_weight:   # if it's getting closer
+                if not (previous_weight < before_previous_wiehgt):  # if before it was getting further: it means the event has changed
+                    print('%3d is getting CLOSER  to   %3d: %03.4f < %03.4f' % (id_number_a, id_number_b, edge.weight, previous_weight))
+                return DistanceEvent.CLOSER
+            elif edge.weight > previous_weight: # if it's getting further
+                if not (previous_weight > before_previous_wiehgt):  # if before it was getting closer: it means the event has changed
+                    print('%3d is getting FURTHER from %3d: %03.4f > %03.4f' % (id_number_a, id_number_b, edge.weight, previous_weight))
+                return DistanceEvent.FURTHER
+    return None
 
 
 def detect_group(people_graph, everyone_in_frame, max_distance=140):
