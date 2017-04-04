@@ -1,8 +1,9 @@
+from collections import deque
+import numpy as np
 from analysis.frame_coord import FrameCoord
 from analysis.frame_coord_list import FrameCoordList
-from analysis.person_path import PersonPath
 from analysis.people_paths import PeoplePaths
-import numpy as np
+from analysis.person_path import PersonPath
 from graph.graph import Graph
 
 
@@ -25,9 +26,19 @@ def create_people_paths(image_coords_paths, world_coords_paths):
         i_coords_path = image_coords_paths[index]
         w_coords_path = world_coords_paths[index]
         person_path = create_person(i_coords_path, w_coords_path)
+
+        if index != 0:
+            while does_id_already_exists(person_path.id_number, people_paths):
+                person_path.id_number += 1
+
         people_paths[index] = person_path
 
     return PeoplePaths(people_paths)
+
+
+def does_id_already_exists(id_number, people_paths):
+    id_number_list = [person_path.id_number for person_path in people_paths if person_path is not None]
+    return id_number in id_number_list
 
 
 def create_person(image_coords_path, world_coords_path):
@@ -136,3 +147,50 @@ def calc_distances_for_everyon_in_frame(everyone_in_frame, people_graph):
             people_graph.add_edge(person_path.id_number, id_number, distance)
 
     return people_graph
+
+
+def detect_group(people_graph, everyone_in_frame, max_distance=140):
+    """
+
+    :param people_graph:
+    :type people_graph: Graph
+    :param everyone_in_frame:   [PersonPath]
+    :type everyone_in_frame: list
+    :param max_distance:
+    :return:
+    """
+    groups = deque()
+
+    ids_in_frame = [person_path.id_number for person_path in everyone_in_frame]
+    nodes_in_frame = [node for node in people_graph.get_nodes() if node.item in ids_in_frame]
+
+    for node in nodes_in_frame:
+        if not does_belong_to_any_group(node, groups):
+            group = perform_group(node, max_distance)
+            groups.append(group)
+
+    return groups
+
+
+def does_belong_to_any_group(node, groups):
+    for group in groups:
+        if node in group:
+            return True
+
+    return False
+
+
+def perform_group(node, max_distance, group=None):
+    g = deque([edge.target for edge in node.get_edges() if edge.weight <= max_distance])
+    g.append(node)
+
+    if group is None:   # the base case: if this is the first call of this function
+        group = g
+        for n in list(group):     # for every person nearby
+            group = perform_group(n, max_distance, group)
+    else:   # if there is already a group
+        for n in g:  # for every person nearby
+            if n not in group:   # if this person is not already in the group
+                group.append(n)  # add this person
+
+    return group
