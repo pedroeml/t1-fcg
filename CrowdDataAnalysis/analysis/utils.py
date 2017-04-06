@@ -118,13 +118,15 @@ def create_graph(people_paths):
     return people_graph
 
 
-def calc_distances_for_everyon_in_frame(everyone_in_frame, people_graph):
+def calc_distances_for_everyon_in_frame(everyone_in_frame, people_graph, too_far_distance, minimum_distance_change):
     """
     
     :param everyone_in_frame: [PersonPath]
     :type everyone_in_frame: list
     :param people_graph: 
     :type people_graph: Graph
+    :param too_far_distance:
+    :param minimum_distance_change:
     :return: 
     :rtype: Graph
     """
@@ -147,19 +149,20 @@ def calc_distances_for_everyon_in_frame(everyone_in_frame, people_graph):
             distance = all_euclidean_distances[i]
             people_graph.add_edge(person_path.id_number, id_number, distance)
 
-            if distance < 400:  # if its not too far
-                distance_event(person_path.id_number, id_number, people_graph)
+            if distance < too_far_distance:  # if it's not too far
+                distance_event(person_path.id_number, id_number, people_graph, minimum_distance_change)
 
     return people_graph
 
 
-def distance_event(id_number_a, id_number_b, people_graph):
+def distance_event(id_number_a, id_number_b, people_graph, minimum_distance_change):
     """
     
     :param id_number_a: 
     :param id_number_b: 
     :param people_graph: 
     :type people_graph: Graph
+    :param minimum_distance_change:
     :return: 
     """
     node_a = people_graph.find_node(id_number_a)
@@ -168,30 +171,30 @@ def distance_event(id_number_a, id_number_b, people_graph):
 
     try:
         previous_weight = edge.weight_history[-2]
-        before_previous_wiehgt = edge.weight_history[-3]
-    except IndexError as indexerr:
+        before_previous_weight = edge.weight_history[-3]
+    except IndexError:
         return None
     else:
-        if abs(edge.weight - previous_weight) > 2:    # ignoring little distance changes
+        if abs(edge.weight - previous_weight) > minimum_distance_change:    # ignoring little distance changes
             if edge.weight < previous_weight:   # if it's getting closer
-                if not (previous_weight < before_previous_wiehgt):  # if before it was getting further: it means the event has changed
+                if not (previous_weight < before_previous_weight):  # if before it was getting further: it means the event has changed
                     print('%3d is getting CLOSER  to   %3d: %03.4f < %03.4f' % (id_number_a, id_number_b, edge.weight, previous_weight))
                 return DistanceEvent.CLOSER
-            elif edge.weight > previous_weight: # if it's getting further
-                if not (previous_weight > before_previous_wiehgt):  # if before it was getting closer: it means the event has changed
+            elif edge.weight > previous_weight:     # if it's getting further
+                if not (previous_weight > before_previous_weight):  # if before it was getting closer: it means the event has changed
                     print('%3d is getting FURTHER from %3d: %03.4f > %03.4f' % (id_number_a, id_number_b, edge.weight, previous_weight))
                 return DistanceEvent.FURTHER
     return None
 
 
-def detect_group(people_graph, everyone_in_frame, max_distance=140):
+def detect_group(people_graph, everyone_in_frame, grouping_max_distance):
     """
 
     :param people_graph:
     :type people_graph: Graph
     :param everyone_in_frame:   [PersonPath]
     :type everyone_in_frame: list
-    :param max_distance:
+    :param grouping_max_distance:
     :return:
     """
     groups = deque()
@@ -201,7 +204,7 @@ def detect_group(people_graph, everyone_in_frame, max_distance=140):
 
     for node in nodes_in_frame:
         if not does_belong_to_any_group(node, groups):
-            group = perform_group(node, max_distance)
+            group = perform_group(node, grouping_max_distance)
             groups.append(group)
 
     return groups
@@ -215,14 +218,14 @@ def does_belong_to_any_group(node, groups):
     return False
 
 
-def perform_group(node, max_distance, group=None):
-    g = deque([edge.target for edge in node.get_edges() if edge.weight <= max_distance])
+def perform_group(node, grouping_max_distance, group=None):
+    g = deque([edge.target for edge in node.get_edges() if edge.weight <= grouping_max_distance])
     g.append(node)
 
     if group is None:   # the base case: if this is the first call of this function
         group = g
         for n in list(group):     # for every person nearby
-            group = perform_group(n, max_distance, group)
+            group = perform_group(n, grouping_max_distance, group)
     else:   # if there is already a group
         for n in g:  # for every person nearby
             if n not in group:   # if this person is not already in the group
