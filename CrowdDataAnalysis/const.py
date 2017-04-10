@@ -14,4 +14,4 @@ def load_config_file(config_file_path):
     return input_folder_path, too_far_distance, grouping_max_distance, minimum_distance_change, fps
 
 
-INPUT_FOLDER_PATH, TOO_FAR_DISTANCE, GROUPING_MAX_DISTANCE, MINIMUM_DISTANCE_CHANGE, FPS = load_config_file('..\constants.conf')
+INPUT_FOLDER_PATH, TOO_FAR_DISTANCE, GROUPING_MAX_DISTANCE, MINIMUM_DISTANCE_CHANGE, FPS = load_config_file('.\constants.conf')
