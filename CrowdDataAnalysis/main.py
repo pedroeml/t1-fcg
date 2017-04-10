@@ -4,6 +4,8 @@ import numpy as np
 from const import *
 import visualization.utils
 from visualization import display_frame
+from analysis import distancing
+from analysis import grouping
 
 
 # Some directories doesn't have %06d.jpg file name format! In this case, try %04.jpg
@@ -31,5 +33,7 @@ colors = visualization.utils.generate_colors()
 frame_number = 1
 for frame_filepath in all_frames_filespath:
     everyone_in_frame = people_paths.everyone_in_frame(frame_number)
-    display_frame.display(frame_filepath, world_background, everyone_in_frame, people_graph, TOO_FAR_DISTANCE, MINIMUM_DISTANCE_CHANGE, GROUPING_MAX_DISTANCE, colors, world_min_x, world_min_y, time_per_frame)
+    people_graph = distancing.calc_distances_for_everyon_in_frame(everyone_in_frame, people_graph, TOO_FAR_DISTANCE, MINIMUM_DISTANCE_CHANGE)
+    groups = grouping.detect_group(people_graph, everyone_in_frame, GROUPING_MAX_DISTANCE)
+    display_frame.display(frame_filepath, world_background, everyone_in_frame, groups, colors, world_min_x, world_min_y, time_per_frame)
     frame_number += 1
