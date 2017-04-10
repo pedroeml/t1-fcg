@@ -1,6 +1,7 @@
 import cv2 as cv
 from collections import deque
-from analysis import utils
+from analysis import distancing
+from analysis import grouping
 
 
 def display(frame_filepath, world_background, everyone_in_frame, people_graph, too_far_distance, minimum_distance_change, grouping_max_distance, colors, world_min_x, world_min_y, time_per_frame):
@@ -14,8 +15,8 @@ def display(frame_filepath, world_background, everyone_in_frame, people_graph, t
     w = int(width * 0.05)
     h = int(height * 0.08)
 
-    people_graph = utils.calc_distances_for_everyon_in_frame(everyone_in_frame, people_graph, too_far_distance, minimum_distance_change)
-    groups = utils.detect_group(people_graph, everyone_in_frame, grouping_max_distance)
+    people_graph = distancing.calc_distances_for_everyon_in_frame(everyone_in_frame, people_graph, too_far_distance, minimum_distance_change)
+    groups = grouping.detect_group(people_graph, everyone_in_frame, grouping_max_distance)
 
     groups_colors = deque(colors)
     for group in groups:
