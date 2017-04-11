@@ -24,12 +24,16 @@ def detect_group(people_graph, everyone_in_frame, grouping_max_distance):
     return groups
 
 
-def does_belong_to_any_group(node, groups):
+def find_group_that_it_belongs(node, groups):
     for group in groups:
         if node in group:
-            return True
+            return group
 
-    return False
+    return None
+
+
+def does_belong_to_any_group(node, groups):
+    return True if find_group_that_it_belongs(node, groups) is not None else False
 
 
 def perform_group(node, grouping_max_distance, group=None):
@@ -46,3 +50,59 @@ def perform_group(node, grouping_max_distance, group=None):
                 group.append(n)  # add this person
 
     return group
+
+
+def differences_between_groups(group_a, group_b):
+    people_not_in_group_b = deque()
+    people_not_in_group_a = deque()
+
+    for node in group_a:
+        if not (node in group_b):
+            people_not_in_group_b.append(node)
+
+    for node in group_b:
+        if not (node in group_a):
+            people_not_in_group_a.append(node)
+
+    return people_not_in_group_b, people_not_in_group_a
+
+
+def are_groups_the_same(group_a, group_b):
+    if len(group_a) != len(group_b):
+        return False
+
+    people_not_in_group_b, people_not_in_group_a = differences_between_groups(group_a, group_b)
+
+    if people_not_in_group_b or people_not_in_group_a:  # if at least one of these lists is not empty
+        return False
+
+    return True
+
+
+def compare_groups(previous_groups, current_groups):
+    for current_group in current_groups:    # for each group in the current groups list
+        for node in current_group:  # for each person in this group
+            foo(node, previous_groups, current_group)
+            break
+
+
+def foo(node, previous_groups, current_group):
+    previous_group_where_it_belongs = find_group_that_it_belongs(node, previous_groups)  # find the group where this person belongs in the previous groups list
+
+    if previous_group_where_it_belongs is None:  # if this person never was in a group before
+        if len(current_group) == 1:
+            print('Group created: ', [n.item for n in current_group])
+        else:
+            print('Group updated: ', [n.item for n in current_group])   # when someone who wasn't in a group before and now joined a group
+    else:  # if this person was in a group before
+        people_not_in_group_b, people_not_in_group_a = differences_between_groups(previous_group_where_it_belongs, current_group)
+
+        # if there is anything bifferent between these groups where this person belongs
+        if people_not_in_group_b:
+            print([person.item for person in people_not_in_group_b], "left %d's group:" % node.item, [n.item for n in current_group])
+        if people_not_in_group_a:
+            print([person.item for person in people_not_in_group_a], "joined %d's group:" % node.item, [n.item for n in current_group])
+
+        return True
+
+    return False
