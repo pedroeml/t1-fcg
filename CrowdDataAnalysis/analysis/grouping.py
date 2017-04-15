@@ -82,11 +82,11 @@ def are_groups_the_same(group_a, group_b):
 def compare_groups(previous_groups, current_groups):
     for current_group in current_groups:    # for each group in the current groups list
         for node in current_group:  # for each person in this group
-            foo(node, previous_groups, current_group)
+            identify_grouping_events(node, previous_groups, current_group)
             break
 
 
-def foo(node, previous_groups, current_group):
+def identify_grouping_events(node, previous_groups, current_group):
     previous_group_where_it_belongs = find_group_that_it_belongs(node, previous_groups)  # find the group where this person belongs in the previous groups list
 
     if previous_group_where_it_belongs is None:  # if this person never was in a group before
