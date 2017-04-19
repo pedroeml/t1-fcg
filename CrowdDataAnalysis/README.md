@@ -21,9 +21,10 @@
 - CN-02
 
 Em alguns vídeos percebe-se que as coordenadas de mundo estão um tanto estranhas na visualização!
-	- BR-07
+- BR-07
+
 A camera (imagem e mundo) está num ângulo estranho (mas não compromete a detecção de eventos:
-	- AT-01
+- AT-01
 
 ### TooFarDistance:
 Distância máxima que define se é necessário verificar evento de aproximação/afastamento
