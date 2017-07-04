@@ -7,7 +7,7 @@ Trabalho da disciplina de Fundamentos de Computação Gráfica de 2017/I do curs
 - Id displaying
 - Grouping identification as bounding rectangle's color 
 
-![image](analysis/plots/camera_view.jpg)
+![image](imgs/camera_view.jpg)
 
 ## World view
 
@@ -16,11 +16,11 @@ Trabalho da disciplina de Fundamentos de Computação Gráfica de 2017/I do curs
 - Grouping identification as bounding rectangle's color
 - Trajectories
 
-![image](analysis/plots/world_view.jpg)
+![image](imgs/world_view.jpg)
 
 ## 3D view
 
 - OpenGL's 3D objects
 - Grouping identification as object's color 
 
-![image](analysis/plots/3d_view.jpg)
+![image](imgs/3d_view.jpg)
