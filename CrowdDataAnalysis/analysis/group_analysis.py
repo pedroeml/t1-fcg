@@ -32,7 +32,12 @@ class GroupAnalysis:
         self.fields['min_group_elements'].append(self.min_group_elements)
         self.fields['avg_group_elements'].append(self.avg_group_elements)
         self.fields['max_group_elements'].append(self.max_group_elements)
-
+        print('MIN NUMBER OF GROUPS: %d' % self.min_num_groups)
+        print('AVG NUMBER OF GROUPS: %d' % self.avg_num_groups)
+        print('MAX NUMBER OF GROUPS: %d' % self.max_num_groups)
+        print('MIN GROUP ELEMENTS: %d' % self.min_group_elements)
+        print('AVG GROUP ELEMENTS: %d' % self.avg_group_elements)
+        print('MAX GROUP ELEMENTS: %d' % self.max_group_elements)
         self.frames_count += 1
 
     def update_num_groups(self, groups):
