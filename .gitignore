@@ -4,4 +4,3 @@ __pycache__/
 .idea/
 .ipynb_checkpoints/
 *.json
-*.jpg
