@@ -24,15 +24,15 @@ def display(frame_filepath, world_background, everyone_in_frame, groups, colors,
             if person_path:
                 person_path = person_path[0]
 
-                # x, y = person_path.image_frame_coordinates_list.current_frame_coord_xy()
-                #
-                # min_x = x - int(w / 2)
-                # min_y = y - int(h / 2)
+                x, y = person_path.image_frame_coordinates_list.current_frame_coord_xy()
+
+                min_x = x - int(w / 2)
+                min_y = y - int(h / 2)
 
                 person_path.image_frame_coordinates_list.next_frame_coord()
 
-                # cv.rectangle(im, (min_x, min_y), (min_x + w, min_y + h), color, 2)
-                # cv.putText(im, str(person_path.id_number), (min_x, min_y), 0, 1, (0, 0, 0), 2)
+                cv.rectangle(im, (min_x, min_y), (min_x + w, min_y + h), color, 2)
+                cv.putText(im, str(person_path.id_number), (min_x, min_y), 0, 1, (0, 0, 0), 2)
 
                 x, y = person_path.world_frame_coordinates_list.current_frame_coord_xy()
                 people_coords.append([x, y, [channel / 255 for channel in color]])
@@ -44,7 +44,7 @@ def display(frame_filepath, world_background, everyone_in_frame, groups, colors,
                 cv.rectangle(world, (min_x, min_y), (min_x + w, min_y + w), color, 2)
                 cv.putText(world, str(person_path.id_number), (min_x, min_y), 0, 1, (0, 0, 0), 2)
 
-    # cv.imshow('im', im)
+    cv.imshow('im', im)
     cv.imshow('world', world)
     cv.waitKey(time_per_frame)
 

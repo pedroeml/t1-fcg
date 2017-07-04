@@ -52,12 +52,12 @@ class View:
     def especifica_parametros_visualizacao(self):
         glMatrixMode(GL_PROJECTION)
         glLoadIdentity()
-        gluPerspective(self.angle, self.fAspect, 0.5, 2000)
+        gluPerspective(self.angle, self.fAspect, 0.5, 3000)
 
         self.posiciona_observador()
 
     def desenha_chao(self):
-        glColor3f(1, 0, 1)
+        glColor3f(0, 0, 0)
         glLineWidth(3)
         glBegin(GL_LINES)
 
@@ -72,15 +72,39 @@ class View:
         glEnd()
         glLineWidth(1)
 
-    def add_solid_cube(self, x, z, cube_width, cube_height, r, g, b):
+    def add_solid_cube(self, x, z, width, height, r, g, b):
         glColor3f(r, g, b)
         glPushMatrix()
-        y = cube_height*cube_width / 2
+        y = height * width / 2
         glTranslatef(x, y, z)
         glRotatef(-90, 1, 0, 0)
         glEnable(GL_DEPTH_TEST)    # desenha na ordem certa
 
-        glutSolidCube(cube_height*cube_height)
+        glutSolidCube(height * height)
+
+        glPopMatrix()
+
+    def add_solid_cone(self, x, z, width, height, r, g, b):
+        glColor3f(r, g, b)
+        glPushMatrix()
+        y = height * width / 2
+        glTranslatef(x, y, z)
+        glRotatef(-90, 1, 0, 0)
+        glEnable(GL_DEPTH_TEST)    # desenha na ordem certa
+
+        glutSolidCone(width * 7, height * 7, 6, 4)
+
+        glPopMatrix()
+
+    def add_solid_sphere(self, x, z, width, height, r, g, b):
+        glColor3f(r, g, b)
+        glPushMatrix()
+        y = height * width / 2
+        glTranslatef(x, y, z)
+        glRotatef(-90, 1, 0, 0)
+        glEnable(GL_DEPTH_TEST)    # desenha na ordem certa
+
+        glutSolidSphere((height + height) * 3, 6, 4)
 
         glPopMatrix()
 
@@ -99,6 +123,7 @@ class View:
                 print('FINISHED!')
                 if not self.group_analysis.exported:
                     analysis = self.group_analysis.export_analysis('group_analysis.json')
+                sys.exit(0)
 
             if frame_filepath:
                 everyone_in_frame = self.people_paths.everyone_in_frame(self.frame_number)
@@ -118,9 +143,16 @@ class View:
                 displayed_frame = display_frame.display(frame_filepath, self.world_background, everyone_in_frame, groups, self.colors, self.world_min_x, self.world_min_y, self.time_per_frame)
                 self.frame_number += 1
 
+                i = 0
                 if displayed_frame:
                     for person_coord in displayed_frame:
-                        self.add_solid_cube(person_coord[0] - 700, person_coord[1] - 700, 6, 6, person_coord[2][0], person_coord[2][1], person_coord[2][2])
+                        if i % 5 == 0:
+                            self.add_solid_cube(person_coord[0] - 700, person_coord[1] - 700, 6, 6, person_coord[2][0], person_coord[2][1], person_coord[2][2])
+                        elif i % 2 == 0:
+                            self.add_solid_cone(person_coord[0] - 700, person_coord[1] - 700, 6, 6, person_coord[2][0], person_coord[2][1], person_coord[2][2])
+                        else:
+                            self.add_solid_sphere(person_coord[0] - 700, person_coord[1] - 700, 6, 6, person_coord[2][0], person_coord[2][1], person_coord[2][2])
+                        i += 1
 
         self.desenha_chao()
 
@@ -139,9 +171,11 @@ class View:
 
         self.especifica_parametros_visualizacao()
 
-    def teclado(self, key, x, y):
-        if key == 27:
-            sys.exit(0)
+    def teclado(self, *args):
+        # If escape is pressed, kill everything.
+        if args[0] == chr(27):
+            print('ESC')
+            sys.exit()
 
     def teclas_especiais(self, key, x, y):
         if key == GLUT_KEY_LEFT:
